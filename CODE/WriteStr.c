@@ -17,19 +17,15 @@
 
 #include "dowser.h"
 
-void space();
-void WritePDB();
-void WriteXYZ();
+void WriteXYZ(FILE *outfile, int num, PDB *atoms);
+void WritePDB(FILE *fp, int nAtoms, PDB *atoms);
+void space(FILE *fp, int nSpace);
 
 /***********************************************************************************
  *  WriteXYZ() : write the new pdb file with LJ parameters and charges
  ***********************************************************************************/
 
-void WriteXYZ(outfile,num,atoms)
-
-FILE *outfile;
-int num;
-PDB *atoms;
+void WriteXYZ(FILE *outfile, int num, PDB *atoms)
 {
 
 int i;
@@ -62,11 +58,7 @@ char aname[5],achar;
  *  WritePDB(): write the protein str. in PDB format w/occupanacy and beta values
  ***********************************************************************************/
 
-void WritePDB (fp,nAtoms,atoms)
-
-FILE *fp;
-int nAtoms;
-PDB *atoms;
+void WritePDB (FILE *fp, int nAtoms, PDB *atoms)
 {
 
   int i, nSpace;
