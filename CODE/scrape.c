@@ -25,8 +25,8 @@
 #define TRUE 1
 #define FALSE 0
 
-extern void readPDB10 ();
-extern void WritePDB ();
+extern void readPDB10 (char *pdb_file, int *numAtoms, PDB **Atoms);
+extern void WritePDB (FILE *fp, int nAtoms, PDB *atoms);
 
 void main(int argc, char *argv[])
 {
