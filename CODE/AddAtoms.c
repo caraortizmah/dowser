@@ -25,9 +25,9 @@
 #define CALL (void) 
 #define SQRT sqrt
 
-REAL ScalarProduct3 ();
-void CrossProduct();
-void VectorNormalize3();
+REAL ScalarProduct3(REAL *a, REAL *b);
+void CrossProduct(REAL *a, REAL *b, REAL *v);
+void VectorNormalize3(REAL *a);
 
 int 
     Add1Atom (atoms,backback, backat, refatom, atomx, bondlength, bondangle, dihedral)
