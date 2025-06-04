@@ -37,18 +37,21 @@
 extern void readPDB10(char *, int *, PDB **);
 extern void initVDW (char *,int,PDB *);
 
-REAL WaterEnergy();
-REAL TransMin();
-REAL RotMin();
-REAL BothMin();
+void appendWat(PDB *wat);
+void WaterPairList(int Num_atoms);
+REAL WaterEnergy(REAL *grad);
+void RotGrad(REAL *grad, REAL *rot_grad, int water_num);
+REAL TransMin(REAL *coor, REAL *RigidGrad);
+void TranslateMolecule(REAL *xyz_new);
+REAL RotMin(REAL *variables, REAL *rot_grad);
+void OrientMolecule(REAL *angles);
+REAL BothMin(REAL *variables, REAL *RigidGrad);
+
+extern int ConjGradMinimize(REAL *p, int n, REAL ftol, int *iter, REAL *fret, REAL (*function_ptr)(REAL *, REAL *));
+extern void CrossProduct(REAL *a, REAL *b, REAL *v);
+extern void TurnMol(REAL angle, REAL *spindle, REAL *Xyz, int pivot, int Num_atoms);
 REAL ScalarProduct3 ();
 void PrintMol();
-void appendWat();
-void CrossProduct ();
-int ConjGradMinimize ();
-void OrientMolecule ();
-void TranslateMolecule ();
-void WaterPairList();
 
 PDB *pro;                       /* protein coordinates */
 int **NBPairs;                  /* pair-list */
@@ -262,9 +265,7 @@ return (wat_iter+1);
  *
  ******************************************************************/
 
-void WaterPairList(Num_atoms)
-
-int Num_atoms;        /* number of atoms in pro structure */
+void WaterPairList(int Num_atoms)        /* number of atoms in pro structure */
 {
 
 int numPairs,i,iat,jat;
@@ -312,9 +313,7 @@ return;
  *
  ******************************************************************/
 
-void appendWat(wat)
-
-PDB *wat;
+void appendWat(PDB *wat)
 {
 
 int i;
@@ -346,9 +345,7 @@ return;
  *  returns total energy in kcal/mol
  ******************************************************************/
    
-REAL WaterEnergy(grad)
-
-REAL *grad;           /* total energy gradient */
+REAL WaterEnergy(REAL *grad)           /* total energy gradient */
 {
 
 int i,iwat,j,k,l;
@@ -428,12 +425,7 @@ return (ener);
  *
  ******************************************************************/
 
-void RotGrad(grad,rot_grad,water_num) 
-
-REAL *grad;           /* cartesian gradient */
-REAL *rot_grad;       /* rotational gradient */
-int water_num;        /* which water */
-
+void RotGrad(REAL *grad, REAL *rot_grad, int water_num)        /* which water */
 {
 int i;
 REAL torque1[3],torque2[3];
@@ -461,10 +453,7 @@ return;
  *
  ******************************************************************/
 
-REAL TransMin(coor,RigidGrad)
-
-REAL *coor;         /* oxygen coordinates */
-REAL *RigidGrad;    /* energy grad. for min. algorithm */
+REAL TransMin(REAL *coor, REAL *RigidGrad)    /* energy grad. for min. algorithm */
 {
 
 REAL ener;          /* total potential energy for water */
@@ -501,9 +490,7 @@ return (ener);
  *
  ******************************************************************/
 
-void TranslateMolecule(xyz_new)
-REAL *xyz_new;
-
+void TranslateMolecule(REAL *xyz_new)
 {
 REAL displ[3];
 int i,j,k;
@@ -535,10 +522,7 @@ return;
  *
  ******************************************************************/
 
-REAL RotMin(variables,rot_grad)
-
-REAL *variables;         /* euler angles */
-REAL *rot_grad;          /* energy grad. for min. algorithm */
+REAL RotMin(REAL *variables, REAL *rot_grad)          /* energy grad. for min. algorithm */
 {
 
 REAL ener;               /* total potential energy for water */
@@ -575,9 +559,7 @@ return (ener);
  *                  by a set of angles.
  *
  ******************************************************************/
-void OrientMolecule(angles)
-REAL *angles;
-
+void OrientMolecule(REAL *angles)
 {
 REAL spindle[3];
 int iwat;
@@ -609,11 +591,7 @@ return;
  *
  ******************************************************************/
 
-REAL BothMin(variables,RigidGrad)
-
-REAL *variables;   /* 0..3*numWat        - oxygen coordinates
-                      3*numWat..6*numWat - euler angles */
-REAL *RigidGrad;   /* gradient for rotation and translation */
+REAL BothMin(REAL *variables, REAL *RigidGrad)   /* gradient for rotation and translation */
 {
 
 REAL *grad;        /* cartesian energy gradient */
