@@ -23,9 +23,10 @@
 #define HBTYPE(i) pro[i].key_dict
 #define INDEX(i) pro[i].newResNo
 
-extern void readPDB10(char *, int *, PDB **);
-extern REAL DistSq(REAL *, REAL *);
-int LocateMyPartners (int, int, int);
+extern void initVDW(char *filename, int num_atoms, PDB *atoms);
+extern void readPDB10(char *filename, int *num_atoms, PDB **atoms_ptr);
+extern REAL DistSq(REAL r1[3], REAL r2[3]);
+int LocateMyPartners (int ihbtype, int ipro, int iindex);
 
 PDB *pro;                       /* protein coordinates */
 int numPro;
@@ -43,7 +44,7 @@ if (argc != 2)  {
 
 /* read the protein coordinates */
 readPDB10 (argv[1], &numPro, &pro);
-initVDW(argv[1], &numPro, &pro);
+initVDW(argv[1], numPro, pro);
 
 /* loop over all the protein atoms to find all potential H-bonders */
 for (ipro=0;ipro<numPro;ipro++)  {
@@ -99,9 +100,7 @@ fprintf (stdout,"Total number of partners found = %d\n",numPartners);
  *    (Hydrogen atoms have hbtype=0)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int LocateMyPartners (ihbtype,ipro,iindex)
-int ihbtype, ipro, iindex;
-
+int LocateMyPartners (int ihbtype, int ipro, int iindex)
 {
 
 int jpro;
