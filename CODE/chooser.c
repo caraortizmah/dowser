@@ -34,10 +34,10 @@
 #define contact connect*connect 
 
 extern void readPDB10 (char *, int *, PDB **);
-extern void WritePDB ();
-void chooser();
-void sparser();
-void SortByEnergy();
+extern void WritePDB(FILE *fp, int nAtoms, PDB *atoms);
+void chooser(int nWatAtom, PDB *wat, int *nAtoms_dense, PDB *dense);
+void sparser(int nAtoms_dense, PDB *dense, int *nAtoms_sparse, PDB *sparse);
+void SortByEnergy(int nWatAtom, PDB *water);
 
 int main(int argc, char *argv[])
 
