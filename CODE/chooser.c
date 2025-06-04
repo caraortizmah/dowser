@@ -111,10 +111,7 @@ int i,j;
  * void SortByEnergy() - Sequentially sort all waters by ascending energy 
  *********************************************************************************/
 
-void SortByEnergy(nWatAtom,water)
-
-int nWatAtom;         /* number of input atoms */
-PDB *water;           /* input waters */
+void SortByEnergy(int nWatAtom, PDB *water)
 {
 
 PDB *temp;            /* temporary storage of water */
@@ -169,12 +166,7 @@ return;
  * chooser() - retain waters with energies below -10 kcal/mol
  *********************************************************************************/
 
-void chooser(nWatAtom,wat,nAtoms_dense,dense)
-
-int nWatAtom;         /* number of input atoms */
-PDB *wat;             /* input waters */
-int *nAtoms_dense;    /* number of remaining waters */
-PDB *dense;           /* remaining waters */
+void chooser(int nWatAtom, PDB *wat, int *nAtoms_dense, PDB *dense)
 {
 
 int nWat;             /* number of input waters */
@@ -212,12 +204,7 @@ return;
  * sparser() - Retain a non-overlapping set of waters, preserve low energy waters
  *********************************************************************************/
 
-void sparser(nAtoms_dense,dense,nAtoms_sparse,sparse)
-
-int nAtoms_dense;      /* number of input waters */
-PDB *dense;            /* input waters */
-int *nAtoms_sparse;    /* number of remaining waters */
-PDB *sparse;           /* remaining waters */
+void sparser(int nAtoms_dense, PDB *dense, int *nAtoms_sparse, PDB *sparse)
 {
 
 int jat,iat,i,j,k;
