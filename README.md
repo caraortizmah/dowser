@@ -1,43 +1,24 @@
-# Authors: Zhang & Hermans
+This program aims to search for a water molecule's energy positions in cavities of proteins having minimum energy. For more information, please refer to the original [Zhang and Hermans](https://www.ncbi.nlm.nih.gov/pubmed/9162944) paper.
 
-# Dowser 
+Dowser's official link is (was?) http://danger.med.unc.edu/hermans/dowser/dowser.htm. However, it is hardly ever available, which is why I decided to upload the Dowser code to ensure program availability.
 
-This program aims to search for a water molecule's energy positions in cavities of proteins having minimum energy. Read Zhang and Hermans' paper for more information:
-  [Zhang & Hermans](https://www.ncbi.nlm.nih.gov/pubmed/9162944).
+## Introduction
 
-Dowser's oficial link: http://danger.med.unc.edu/hermans/dowser/dowser.htm 
-
-However, it is hardly ever available, which is why I decided to upload the Dowser code to ensure program availability.
-
-## Installation
-
-Prior to installing Dowser, type:
+Prior to installing Dowser, update the system package index. For example, on Debian based distributions, type:
 
     $ sudo apt update
     $ sudo apt install build-essential
 
-You need gfotran compiler in linux to install Dowser. However, gfortran 77 is no longer available as a g77. Of course you could find it, but it is advisable to use the latest gfortran compiler, like Gfortran e.g.: 
+You need a FORTRAN (e.g. `gfortran`, `ifort`) and C (e.g. `gcc`) compilers in Linux to install Dowser. These can be installed on Debian based distributions with:
 
-    $ sudo apt-get install gfortran
+    $ sudo apt-get install gfortran gcc
 
-You have to name your gfortran compiler absolute path as g77 in other Dowser versions, e.g.:
+On this repository, the make configuration in file `CODE/Makearch.linux` already includes `gfortran` as the FORTRAN compiler. If you are using another compiler, or in case you are using any other of the available architectures, please modify the line `F77		= f77` inside the corresponding make configuration file to meet your specific situation.
 
-    $ sudo cp /usr/bin/gfortran /usr/bin/g77
-    
-The gfortran compiler has to be named gfortran for Dowser in this GitHub repository version (https://github.com/caraortizmah/dowser.git).
+## Installation
 
-You have to install csh prior to install Dowser, e.g.:
+Once you have downloaded the code get into its folder, and execute the following orders:
 
-     $ sudo apt update
-     $ sudo apt install csh
-
-Download Dowser by typing:
-
-     $ git clone https://github.com/caraortizmah/dowser.git
-
-Once you have downloaded the code, type:
-
-     $ cd $PATH_dowser/
      $ chmod u+x Install
      $ chmod u+x bin/dowser
      $ ./Install
@@ -63,5 +44,3 @@ or
     $ source .bash_profile
     
 That's all there is to it.
-
-For further information about the installation go to: http://somagliablog.blogspot.com/2013/11/install-dowser-program.html
