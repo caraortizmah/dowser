@@ -20,6 +20,8 @@
 #include <math.h>
 #include "dowser.h"
 
+void readPDB10(char *filename, int *nAtom, PDB **atoms);
+
 #define TRUE 1
 #define MAXATOM 100
 #define BONDMAXDIST 2.
@@ -29,32 +31,29 @@
 #define PI180 57.295780
 #define NOTSET -1
 
-void ReaRec();
-char *NxtWord();
-int  NxtInt();
-REAL Distance();
-REAL AngleValue();
-REAL DihedralValue();
-void CrossProduct();
-REAL ScalarProduct3();
-REAL Pair();
-REAL DistSq();
-void MakeChains();
-void MakeBonds();
-void CalcParam();
-void ShowDict();
-void DetermineType();
-
 typedef struct {
     char name[5], resname[5], type[5]; int index, nbond, bond[MAXBOND]; REAL xyz[3];
     REAL length, angle, dihedral;
     int backchain, forwardchain;
 } Atom;
 
-main (argc,argv)
+void ReaRec();
+char *NxtWord();
+int  NxtInt();
+REAL Distance(REAL *a, REAL *b);
+REAL AngleValue(REAL *xi1, REAL *xi2, REAL *xi3);
+REAL DihedralValue(REAL *xiat, REAL *xib, REAL *xibb, REAL *xibbb);
+void CrossProduct(REAL *a, REAL *b, REAL *v);
+REAL ScalarProduct3(REAL *a, REAL *b);
+REAL Pair(REAL *a, REAL *b, REAL *u);
+REAL DistSq(REAL *a, REAL *b);
+void MakeChains(Atom *atoms, int nAtom);
+void MakeBonds(Atom *atoms, int nAtom);
+void CalcParam(Atom *atoms, int nAtom);
+void ShowDict(Atom *atoms, int nAtom);
+void DetermineType(Atom *atoms, int nAtom);
 
-int argc; char *argv[];
-
+int main(int argc, char *argv[])
 {
 FILE *pdbfile;
 char filename[256];
@@ -207,8 +206,7 @@ ATOM ALA  H    N    NOT   1.000  123.0    0.0   0.280 H
 /* * * * * * * * * * * * * * * * * * *
  *  REAL Distance
  * * * * * * * * * * * * * * * * * * */
-REAL Distance (a,b) 
-REAL *a, *b;
+REAL Distance (REAL *a, REAL *b)
 {
     int i;
     REAL aaa=0.;
@@ -228,9 +226,7 @@ REAL *a, *b;
  *	iat,ib,ibb,ibbb = four atom indices, (start at 1)
  *	returns dihedral angle in radians (each "b" is a backchain)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL DihedralValue(xiat,xib,xibb,xibbb)
-REAL *xiat,*xib,*xibb,*xibbb;
-
+REAL DihedralValue(REAL *xiat,REAL *xib,REAL *xibb,REAL *xibbb)
 {
 REAL v[3],w[3],u[3],e1[3],e2[3],ee[3];
 REAL wl,vl,ul,cr,sr;
@@ -250,9 +246,7 @@ REAL wl,vl,ul,cr,sr;
  *	i1,i2,i3 = three atom indices, (start at 1)
  *	returns angle i1-i2-i3, in radians
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL AngleValue(xi1,xi2,xi3)
-REAL *xi1,*xi2,*xi3;
-
+REAL AngleValue(REAL *xi1,REAL *xi2,REAL *xi3)
 {
 REAL d1,d2,d3;
 d1=Distance(xi1,xi2);
@@ -265,8 +259,7 @@ return(acos(-(d3*d3-d1*d1-d2*d2)/(2.*d1*d2)) );
  *  CrossProduct(a,b,v)
  *     Vector cross product (v = a x b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void CrossProduct(a,b,v)
- REAL *a,*b,*v;
+void CrossProduct(REAL *a,REAL *b,REAL *v)
  {
      int i,j,k;
      for (i=0;i<3;i++) {
@@ -280,8 +273,7 @@ void CrossProduct(a,b,v)
  * REAL ScalarProduct3(a,b)
  *     Returns vector scalar product (a . b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
- REAL ScalarProduct3(a,b)
- REAL *a,*b;
+ REAL ScalarProduct3(REAL *a,REAL *b)
  {
      return(*a* *b + *(a+1)* *(b+1) + *(a+2)* *(b+2));
  }
@@ -289,9 +281,7 @@ void CrossProduct(a,b,v)
 /* * * * * * * * * * * * * * * * * * * * * * * * * *
  *   dist_sq: returns distance between 2 points
  * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL DistSq(a,b)
-REAL *a,*b;     /* 3-vectors */
-
+REAL DistSq(REAL *a,REAL *b)
 {
     float r2;
     int k;
@@ -309,9 +299,7 @@ REAL *a,*b;     /* 3-vectors */
  *      u=vector b-a
  *      function returns the distance between a and b
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL Pair(a,b,u)
-REAL *a,*b,*u;
-
+REAL Pair(REAL *a,REAL *b,REAL *u)
 {
 int i;
 /*
@@ -325,11 +313,7 @@ return (sqrt(ScalarProduct3(u,u)));
  *  MakeChains()
  * * * * * * * * * * * * * * * * * * */
 
-void MakeChains(atoms,nAtom)
-
-Atom *atoms;
-int nAtom;
-
+void MakeChains(Atom *atoms, int nAtom)
 {
 int i,j;
 Atom *anatom, *anatomj;
@@ -370,11 +354,7 @@ int forw, back, ib, nb;
 /* * * * * * * * * * * * * * * * * * *
  *  MakeBonds()
  * * * * * * * * * * * * * * * * * * */
-void MakeBonds(atoms, nAtom)
-
-Atom *atoms;
-int nAtom;
-
+void MakeBonds(Atom *atoms, int nAtom)
 {
 int i,j;
 Atom *anatom, *anatomj;
@@ -430,11 +410,7 @@ REAL aaa;
 /* * * * * * * * * * * * * * * * * * *
  *  ShowDict()
  * * * * * * * * * * * * * * * * * * */
-void ShowDict(atoms, nAtom)
-
-Atom *atoms;
-int nAtom;
-
+void ShowDict(Atom *atoms, int nAtom)
 {
 int i;
 Atom *anatom;
@@ -463,11 +439,7 @@ Atom *anatom;
 /* * * * * * * * * * * * * * * * * * *
  *  CalcParam()
  * * * * * * * * * * * * * * * * * * */
-void CalcParam(atoms, nAtom)
-
-Atom *atoms;
-int nAtom;
-
+void CalcParam(Atom *atoms, int nAtom)
 {
 int i,j,jj,jjj;
 Atom *anatom;
@@ -498,11 +470,7 @@ Atom *anatom;
  *  DetermineType()
  *    determine type of carbon atoms on the basis of geometric criteria
  * * * * * * * * * * * * * * * * * * */
-void DetermineType(atoms, nAtom)
-
-Atom *atoms;
-int nAtom;
-
+void DetermineType(Atom *atoms, int nAtom)
 {
 int i,j,jj,jjj, j1, j2;
 int n_change;
