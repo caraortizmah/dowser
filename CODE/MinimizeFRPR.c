@@ -18,15 +18,16 @@
 #include "dowser.h"
 
 #define FreeVector free
-extern void BracketMinimum();
-extern void LineMinimize();
-extern REAL BrentMinimum();
-extern REAL F_atNewVars();
-extern REAL *AllocVector();
-extern void BracketMinimum();
+int ConjGradMinimize(REAL *p, int n, REAL ftol, int *iter, REAL *fret, REAL (*function_ptr)(REAL *, REAL *));
+REAL *AllocVector(int nh);
+void LineMinimize(REAL p[], REAL xi[], int n, REAL *fret, REAL (*function_ptr)(REAL *, REAL *));
+REAL F_atNewVars(REAL x);
+void BracketMinimum(REAL *ax, REAL *bx, REAL *cx, REAL *fa, REAL *fb, REAL *fc, REAL (*function_ptr)(REAL));
+REAL BrentMinimum(REAL a_input, REAL b_input, REAL c_input, REAL (*function_ptr)(REAL), REAL tol, REAL *x_output);
 
 int NumVars_com=0;
-REAL *Vars_com=0,*Grad_com=0,(*nrfunc)();
+REAL *Vars_com=0,*Grad_com=0;
+REAL (*nrfunc)(REAL *, REAL *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *   frprmn
@@ -41,11 +42,7 @@ REAL *Vars_com=0,*Grad_com=0,(*nrfunc)();
  *     Returns status code: 0-error 1-okay 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	
-int ConjGradMinimize(p,n,ftol,iter,fret,function)
-/* int frprmn(p,n,ftol,iter,fret,function) */
-
-REAL *p,ftol,*fret,(*function)();
-int n,*iter;
+int ConjGradMinimize(REAL *p, int n, REAL ftol, int *iter, REAL *fret, REAL (*function_ptr)(REAL *, REAL *))
 {
 
 #define ITMAX 200
@@ -54,25 +51,25 @@ int n,*iter;
 
 int j,its;
 REAL gg,gam,fp,dgg;
-REAL *g,*h,*xi,*AllocVector();
+REAL *g,*h,*xi;
 
 g=AllocVector(n);
 h=AllocVector(n);
 xi=AllocVector(n);
-fp=(*function)(p,xi);
+fp=(*function_ptr)(p,xi);
 for (j=0;j<n;j++)  {
     g[j] = -xi[j];
 	xi[j] = h[j] = g[j];
 }
 for (its=1;its<=ITMAX;its++)  {
 	*iter = its;
-	LineMinimize(p,xi,n,fret,function);
+	LineMinimize(p,xi,n,fret,function_ptr);
   	/*	if (2.0*fabs(*fret-fp) <= ftol*(fabs(*fret)+fabs(fp)+EPS))  {  */
 	if (fabs(*fret-fp) <= ftol)  {
 		FREEALL
 		return (1);
 	}
-	fp = (*function)(p,xi);
+	fp = (*function_ptr)(p,xi);
 	dgg = gg = 0.0;
 	for (j=0;j<n;j++)  {
 		gg += g[j]*g[j];
@@ -100,9 +97,7 @@ return(0);
  *     Allocate a REAL vector of length nh
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-REAL *AllocVector(nh)
-
-int nh;
+REAL *AllocVector(int nh)
 {
 REAL *v;
 v = (REAL *) malloc ((nh) * sizeof(REAL));
@@ -124,10 +119,7 @@ return v;
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void LineMinimize(p,xi,n,fret,function)
-
-REAL p[],xi[],*fret,(*function)();
-int n;
+void LineMinimize(REAL p[], REAL xi[], int n, REAL *fret, REAL (*function_ptr)(REAL *, REAL *))
 {
 
 #ifndef TOL
@@ -149,7 +141,7 @@ if (allocation < NumVars_com) {
     allocation=NumVars_com;
 }
 
-nrfunc=function;
+nrfunc=function_ptr;
 for (j=0;j<n;j++)  {
 	Vars_com[j]=p[j];
 	Grad_com[j]=xi[j];
@@ -185,18 +177,12 @@ return;
  *     extrapolate p from Vars_com + x * searchvector
  *     and compute function for that value of p
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL F_atNewVars(x)
-
-REAL x;
+REAL F_atNewVars(REAL x)
 {
-
-extern int NumVars_com;
-extern REAL *Vars_com,*Grad_com,(*nrfunc)();
 
 int j;
 REAL function_value;
 static REAL *Vars_temp;
-REAL *AllocVector();
 static int allocation=0;
 
 if (allocation<NumVars_com) {
@@ -219,10 +205,7 @@ return function_value;
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void BracketMinimum(ax,bx,cx,fa,fb,fc,function)
-
-REAL *ax,*bx,*cx,*fa,*fb,*fc;
-REAL (*function)();
+void BracketMinimum(REAL *ax, REAL *bx, REAL *cx, REAL *fa, REAL *fb, REAL *fc, REAL (*function_ptr)(REAL))
 {
 
 #define GOLD 1.618034
@@ -234,15 +217,15 @@ REAL (*function)();
 
 REAL ulim,u,r,q,fu,dum;
 
-*fa = (*function)(*ax,NULL);
-*fb = (*function)(*bx,NULL);
+*fa = (*function_ptr)(*ax);
+*fb = (*function_ptr)(*bx);
 if (*fb > *fa)  {
    SHFT(dum,*ax,*bx,dum); /* this swaps ax and bx */
    SHFT(dum,*fb,*fa,dum); 
 }
 /* interpolation between a and b */
 *cx = (*bx)+GOLD*(*bx-*ax);
-*fc = (*function)(*cx,NULL);
+*fc = (*function_ptr)(*cx);
 
 while (*fb > *fc)  {
     r = (*bx-*ax)*(*fb-*fc);
@@ -250,7 +233,7 @@ while (*fb > *fc)  {
     u = (*bx)-((*bx-*cx)*q-(*bx-*ax)*r)/(2.0*SIGN(MAX(fabs(q-r),TINY),q-r));
     ulim = (*bx)+GLIMIT*(*cx-*bx);
     if ((*bx-u)*(u-*cx) > 0.0)  {
-        fu = (*function)(u,NULL);
+        fu = (*function_ptr)(u);
         if (fu < *fc)  { /* minimum between b and c */
 			*ax = (*bx);
 			*bx = u;
@@ -265,22 +248,22 @@ while (*fb > *fc)  {
 		}
 		/* parabolic fit was no good, use default magnification */
 		u = (*cx)+GOLD*(*cx-*bx);
-		fu = (*function)(u,NULL);
+		fu = (*function_ptr)(u);
 	}
 	else if ((*cx-u)*(u-ulim) > 0.0)  { /* parab. fit is between c and its allowed limit */
-		fu = (*function)(u,NULL);
+		fu = (*function_ptr)(u);
 		if (fu < *fc)  {
 			SHFT(*bx,*cx,u,*cx+GOLD*(*cx-*bx))
-			SHFT(*fb,*fc,fu,(*function)(u,NULL))
+			SHFT(*fb,*fc,fu,(*function_ptr)(u))
 		}
 	}
 	else if ((u-ulim)*(ulim-*cx) >= 0.0)  { /* lmit parab. u to maximum allowd value */
 		u = ulim;
-		fu = (*function)(u,NULL);
+		fu = (*function_ptr)(u);
 	}
 	else  { /* reject parab. u, use default magnification */
 		u = (*cx)+GOLD*(*cx-*bx);
-		fu = (*function)(u,NULL);
+		fu = (*function_ptr)(u);
 	}
 	SHFT(*ax,*bx,*cx,u) /* eliminate oldest point and continue */
 	SHFT(*fa,*fb,*fc,fu)
@@ -300,10 +283,7 @@ return;
  *     For more info. see pp. 299-302.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-REAL BrentMinimum(a_input,b_input,c_input,function,tol,x_output)
-
-REAL a_input,b_input,c_input,tol,*x_output;
-REAL (*function)();
+REAL BrentMinimum(REAL a_input, REAL b_input, REAL c_input, REAL (*function_ptr)(REAL), REAL tol, REAL *x_output)
 {
 
 #define ITMAX2 100
@@ -317,7 +297,7 @@ REAL e = 0.0;
 a = ((a_input < c_input) ? a_input : c_input);
 b = ((a_input > c_input) ? a_input : c_input);
 x=w=v=b_input;
-F_w=F_v=F_x=(*function)(x);
+F_w=F_v=F_x=(*function_ptr)(x);
 for (iter=1;iter<=ITMAX2;iter++)  {
 	x_mean = 0.5*(a+b);
 	tol2 = 2.0*(tol1=tol*fabs(x)+ZEPS);
@@ -350,7 +330,7 @@ for (iter=1;iter<=ITMAX2;iter++)  {
 		d = CGOLD*(e=(x >= x_mean ? a-x : b-x));
     }
 	u = (fabs(d) >= tol1 ? x+d : x+SIGN(tol1,d));
-	F_u = (*function)(u);
+	F_u = (*function_ptr)(u);
 	if (F_u <= F_x)  {
 		if (u >= x) a=x;
 		else b=x;
