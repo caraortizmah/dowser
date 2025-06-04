@@ -29,11 +29,13 @@
 extern void readPDB10(char *, int *, PDB **);
 extern void initVDW (char *,int,PDB *);
 
-int AlcoholPairList();
-REAL MinimizeOhEnergy();
-REAL AlcoholEnergy();
-void UpdatePro();
-void WriteXYZ();
+int AlcoholPairList(int central_atom, int Num_atoms);
+REAL MinimizeOhEnergy(REAL A[], REAL B[], int atom_num, int numPro);
+REAL AlcoholEnergy(int atom_num, REAL grad[3]);
+void UpdatePro(REAL *xyz, int atom_num);
+
+extern void WriteXYZ(FILE *outfile, int num, PDB *atoms);
+extern void TurnMol(REAL angle, REAL *spindle, REAL *Xyz, int pivot, int Num_atoms);
 
 PDB *pro;                       /* protein coordinates */
 int NBPairs[MAXPAIRS];          /* pair-list */
@@ -108,12 +110,7 @@ fprintf(stdout,"* SetOH: total energy change = %.2f\n", energy_change);
  *
  ******************************************************************/
 
-REAL MinimizeOhEnergy(A,B,atom_num,numPro)
-
-REAL A[];                /* atom two back from the hydrogen */
-REAL B[];                /* atom one back from the hydrogen */
-int atom_num;            /* hydrogen atom number */
-int numPro;              /* number of protein atoms */
+REAL MinimizeOhEnergy(REAL A[], REAL B[], int atom_num, int numPro)              /* number of protein atoms */
 {
 
 REAL grad[3];            /* potential energy gradient */
@@ -170,10 +167,7 @@ UpdatePro(xyz+3,atom_num);
  *
  ******************************************************************/
 
-void UpdatePro(xyz,atom_num)
-
-REAL *xyz;         /* new coordinates */
-int atom_num;      /* atom number in pro structure */
+void UpdatePro(REAL *xyz, int atom_num)      /* atom number in pro structure */
 {
 int i;
 
@@ -197,10 +191,7 @@ return;
  *  returns total energy in kcal/mol
  ********************************************************************/
    
-REAL AlcoholEnergy(atom_num,grad)
-
-int atom_num;           /* atom number of the alcohol hydrogen */
-REAL grad[3];           /* potential energy grad for hydrogen (not used) */
+REAL AlcoholEnergy(int atom_num, REAL grad[3])           /* potential energy grad for hydrogen (not used) */
 {
 
 int i,j,k;
@@ -241,10 +232,7 @@ return (ener);
  *
  ******************************************************************/
 
-int AlcoholPairList(central_atom,Num_atoms)
-
-int central_atom;     /* atom at center of sphere */
-int Num_atoms;        /* number of atoms in pro structure */
+int AlcoholPairList(int central_atom, int Num_atoms)        /* number of atoms in pro structure */
 {
 
 int numPairs,i,jat;
