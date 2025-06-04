@@ -35,10 +35,13 @@ extern REAL TransMin    (REAL *,REAL *);
 extern REAL RotMin      (REAL *,REAL *);
 extern REAL BothMin     (REAL *,REAL *);
 extern REAL ScalarProduct3 ();
-extern void CrossProduct ();
-extern int ConjGradMinimize();
-extern void OrientMolecule();
-extern void TranslateMolecule();
+extern void CrossProduct(REAL v1[3], REAL v2[3], REAL result[3]);
+extern int ConjGradMinimize(REAL *vars, int n_vars, REAL tol, int *iter, REAL *f_ret, REAL (*func)(REAL *, REAL *));
+extern void OrientMolecule(REAL *angles);
+extern void TranslateMolecule(REAL *xyz_new);
+extern int PairList(REAL *ohh, int *NBPairs, int Num_atoms, PDB *pro);
+extern void Align(int n, REAL *coords, int atom_idx, REAL *vec1, REAL *vec2);
+extern void TurnMol(REAL angle, REAL *axis, REAL *coords, int start_idx, int num_atoms);
 
 PDB *pro;                       /* protein coordinates */
 int NBPairs[MAXPAIRS];          /* pair-list */
@@ -338,9 +341,7 @@ REAL aw[3],dist;
  *
  ******************************************************************/
 
-void PrintMol(file)
-
-FILE *file;
+void PrintMol(FILE *file)
 {
 
 if (file)  { 
@@ -369,9 +370,7 @@ if (file)  {
  *  returns total energy in kcal/mol
  ******************************************************************/
    
-REAL WaterEnergy(grad)
-
-REAL grad[9];           /* total energy gradient */
+REAL WaterEnergy(REAL grad[9])           /* total energy gradient */
 {
 
 int i,j,k,l;
@@ -449,9 +448,7 @@ return (ener);
  *  -Note: used only for global placement of the water 
  ******************************************************************/
   
-REAL ElectEnergy(e_grad)
-
-REAL e_grad[3];         /* elect. grad for oxygen atom */
+REAL ElectEnergy(REAL e_grad[3])         /* elect. grad for oxygen atom */
 {
 
 int i,j,k,l;
@@ -495,10 +492,7 @@ return (e_ener);
  *
  ******************************************************************/
 
-int RotGrad(grad,rot_grad) 
-
-REAL grad[3];           /* energy gradient */
-REAL rot_grad[9];       /* rotational gradient */
+int RotGrad(REAL grad[3], REAL rot_grad[9])       /* rotational gradient */
 
 {
 int i;
@@ -524,10 +518,7 @@ return 1;
  *
  ******************************************************************/
 
-REAL TransMin(coor,RigidGrad)
-
-REAL *coor;         /* oxygen coordinates */
-REAL *RigidGrad;         /* energy grad. for min. algorithm */
+REAL TransMin(REAL *coor, REAL *RigidGrad)         /* energy grad. for min. algorithm */
 {
 
 REAL ener;               /* total potential energy for water */
@@ -566,9 +557,7 @@ return (ener);
  *
  ******************************************************************/
 
-void TranslateMolecule(xyz_new)
-REAL *xyz_new;
-
+void TranslateMolecule(REAL *xyz_new)
 {
 REAL displ[3];
 int i;
@@ -593,10 +582,7 @@ for (i=0;i<3;i++)  {
  *
  ******************************************************************/
 
-REAL RotMin(variables,rot_grad)
-
-REAL *variables;             /* euler angles */
-REAL *rot_grad;         /* energy grad. for min. algorithm */
+REAL RotMin(REAL *variables, REAL *rot_grad)         /* energy grad. for min. algorithm */
 {
 
 REAL ener;               /* total potential energy for water */
@@ -630,9 +616,7 @@ return (ener);
  * OrientMolecule - Rotate molecule around each coordinate axis
  *
  ******************************************************************/
-void OrientMolecule(angles)
-REAL *angles;
-
+void OrientMolecule(REAL *angles)
 {
 REAL spindle[3];
 
@@ -658,10 +642,7 @@ REAL spindle[3];
  *
  ******************************************************************/
 
-REAL BothMin(variables,RigidGrad)
-
-REAL *variables;      /* 0..2 - xyz  3..5 - psi,theta,phi */
-REAL *RigidGrad;      /* gradient for rotation and translation */
+REAL BothMin(REAL *variables, REAL *RigidGrad)      /* gradient for rotation and translation */
 {
 
 REAL grad[9];        /* cartesian energy gradient */
