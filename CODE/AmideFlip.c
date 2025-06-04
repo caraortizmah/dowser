@@ -1,6 +1,3 @@
-#define SHOWPROGRESS
-#define SHOWGROUPS
-#undef DEBUG
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * This is part of the DOWSER program
  *
@@ -24,6 +21,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "dowser.h"
+
+#define SHOWPROGRESS
+#define SHOWGROUPS
+#undef DEBUG
 
 #define NB_CUTOFF_SQ 1.e6  /* if 2 atoms are farther apart, the NB energy is not calculated */
 #define GROUP_CUTOFF  7    /* if 2 amides are within this distance, they are grouped */
@@ -50,21 +51,24 @@ int numAtms;       /* Number of atoms, i,j indices */
 
 int resgroup_num;      /* Number of amidegroups */
 
-extern REAL DistSq();
-extern void initVDW();
-extern void WriteXYZ();
+int SetAmideFlag(PDB *pro_param);
+int GroupAmides(void);
+void FlipOneAmide(int flipme);
+REAL AmideEnergy(void);
+int AmidePairList(int *resorder_i);
+void AtomPairs(int central_atom, int *numpairs);
+void Search(int residnum, int *prior);
+int check(int number);
+int testcon(int rescon);
+int extbit(int string, int bit);
 
-int AmidePairList();
-void FlipOneAmide();
-REAL AmideEnergy();
-void AtomPairs();
-int testcon();
-void Search();
-int check();
+extern void readPDB10(char *filename, int *num_atoms, PDB **atoms_ptr);
+extern void initVDW(char *filename, int num_atoms, PDB *atoms);
+extern void WriteXYZ(FILE *outfile, int num, PDB *atoms);
+extern REAL DistSq(REAL r1[3], REAL r2[3]);
 
 /*  Main */
-void main(int argc, char *argv[])
-  
+int main(int argc, char *argv[])
 { 
   
 /* Give listing of what variables represent */
@@ -230,6 +234,7 @@ void main(int argc, char *argv[])
     WriteXYZ (fp,numAtms,pro);
   }
   else fprintf (stdout,"* FLIP: no residues have been flipped, no new structure output\n");
+  return 0;
 }
 /* * * * *  end main * * * * * */
 
@@ -244,8 +249,7 @@ void main(int argc, char *argv[])
  *    Same thing with N, H1 and H2 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void FlipOneAmide(flipme)
-    int flipme;
+void FlipOneAmide(int flipme)
 {
     int i,j;
     int i1,j1;
@@ -354,8 +358,7 @@ void FlipOneAmide(flipme)
  *  returns total energy in kcal/mol
  ********************************************************************/
 
-REAL AmideEnergy()
-
+REAL AmideEnergy(void)
 {
 int i;
 int iat,jat;
@@ -427,9 +430,7 @@ REAL sum_e_el = sum_e_lj = 0.;
  *
  ******************************************************************/
 
-int AmidePairList(resorder_i)
-
-int *resorder_i;
+int AmidePairList(int *resorder_i)
 {
 
 int i,j,jat;
@@ -463,11 +464,7 @@ return (numpairs);
  *
  ******************************************************************/
 
-void AtomPairs(central_atom, numpairs)
-
-int central_atom;
-int * numpairs;
-
+void AtomPairs(int central_atom, int *numpairs)
 {
 int i,j,jat;
 REAL adist,dist2;
@@ -524,8 +521,7 @@ for(jat=0;jat<numAtms;jat++) {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * int SetAmideFlag()
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-int SetAmideFlag()
-
+int SetAmideFlag(PDB *pro_param)
 {
 int amNum, resnum;
 int i,j,k,kk;
@@ -606,8 +602,7 @@ void Search(int residnum, int *prior)
  * function check()
  *      check if residue is already on list
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-int check(number)
-int number;
+int check(int number)
 {
     int i1,j1;
     for (j1=0; j1<amNum; j1++) {
@@ -651,8 +646,7 @@ int starter,bit2return;
  * int GroupAmides() 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int GroupAmides() 
-
+int GroupAmides(void)
 {
 int i,j,res1,res2;
 int amide1,amide2;
