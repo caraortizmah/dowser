@@ -21,9 +21,10 @@
 #include "dowser.h"
 #define SEPARATION 1
 
-extern void readPDB10(char *, int *, PDB **);
+extern void readPDB10(char *filename, int *num_atoms, PDB **atoms_ptr);
+extern void WritePDB(FILE *fp, int nAtoms, PDB *atoms);
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int	numAtoms, numAtoms2=0;
   PDB	*pdbP, *pdb2;
@@ -80,4 +81,5 @@ void main(int argc, char *argv[])
   fp = fopen (argv[2],"w");
   (void) WritePDB (fp, numAtoms2, pdb2);
 
+  return 0;
 }  /* end main */
