@@ -34,16 +34,13 @@
 
 REAL *Xyz;
 int Num_atoms;
-void HashXyz_l();
-void ScanHash();
-void initVDW ();
-REAL DistSq();
-int MakeApex();
+void HashXyz_l(void);
+void ScanHash(REAL *xcop, int *pairs, int *npair, int Num_box_cutoff);
+extern void initVDW(char *filename, int num_atoms, PDB *atoms);
+extern REAL DistSq(REAL r1[3], REAL r2[3]);
+extern int MakeApex(REAL *xyz3fold, REAL *distance, REAL *xyzapex);
 
-int main (argc,argv)
-
-int argc; char * argv[];
-
+int main(int argc, char *argv[])
 {
 
 #undef DEBUG
@@ -219,8 +216,7 @@ REAL xzero,yzero,zzero; /* Set in HashXyz() */
 /* #define DEBUG */
 
 
-void HashXyz_l()
-
+void HashXyz_l(void)
 {
 REAL abox0[3],abox1[3];
 
@@ -369,11 +365,7 @@ int BOXSIZE; set in input
 int Num_box_cutoff,Num_cubes[],Number_of_planes; set by HashXyz()
 */
 
-void ScanHash(xcop,pairs,npair,Num_box_cutoff) 
-int Num_box_cutoff;
-REAL *xcop;
-int *pairs; int *npair;
-
+void ScanHash(REAL *xcop, int *pairs, int *npair, int Num_box_cutoff) 
 {
 int ix,iy,ix1,ix2,iy1,iy2,iz,iz1,iz2,iz3;
 int where;
