@@ -23,7 +23,7 @@
 #include "dowser.h"
 
 extern void readPDB10 (char *, int *, PDB **);
-REAL Distance2 ();
+REAL Distance2(PDB wat1, PDB wat2);
 
 int main(int argc, char *argv[])
 
@@ -93,9 +93,7 @@ PDB pdb1,pdb2;
 }
 
 /* subroutine Distance2 */
-REAL Distance2 (wat1,wat2)
-PDB wat1, wat2;
-
+REAL Distance2 (PDB wat1, PDB wat2)
 {
     REAL dd,ddd;
 
