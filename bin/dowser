@@ -222,7 +222,7 @@ if ( $ONLYXTAL == "1" ) then
 	echo "* OVERLAPS HAVE BEEN REMOVED - xtal water of lowest-energy retained" 
 	echo "* execute: chooser place_xtal_o.dow chooser.dow distance"
 	echo "* execute: mv chooser.dow place_xtal_o.dow"
-	set W = WW[1]
+	set W = $WW[1]
 @	W /= 3
 	echo "* $W water molecules remain"
 	echo "*"
