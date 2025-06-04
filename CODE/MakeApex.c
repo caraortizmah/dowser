@@ -17,12 +17,13 @@
 
 #define REAL double
 
-void VectorCopy();
-void CrossProduct();
-int VectorNormalize3();
-REAL ScalarProduct3();
-REAL Pair();
-REAL DistSq();
+void VectorCopy(REAL *a, REAL *b);
+void CrossProduct(REAL *a, REAL *b, REAL *v);
+int VectorNormalize3(REAL *a);
+REAL ScalarProduct3(REAL *a, REAL *b);
+REAL Pair(REAL *a, REAL *b, REAL *u);
+REAL DistSq(REAL *a, REAL *b);
+int MakeApex(REAL *xyz3fold, REAL *distance, REAL *xyzapex);
 int FourBody();
 
 /* * * * * * * * * * * * * * * * * * * * * * * *
@@ -35,9 +36,7 @@ int FourBody();
  *      needs subroutines from $SIGMA/SIGLIB
  * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MakeApex(xyz3fold,distance,xyzapex)
-REAL *xyz3fold, *distance, *xyzapex;
-
+int MakeApex(REAL *xyz3fold, REAL *distance, REAL *xyzapex)
 {
 /* input */
 REAL *xyz1=xyz3fold,*xyz2=xyz3fold+3,*xyz3=xyz3fold+6;
@@ -137,9 +136,7 @@ void VectorCopy (REAL *a, REAL *b)
  *      u=vector b-a
  *      function returns the distance between a and b
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL Pair(a,b,u)
-REAL *a,*b,*u;
-
+REAL Pair(REAL *a, REAL *b, REAL *u)
 {
 int i;
 /*
@@ -153,8 +150,7 @@ return (sqrt(ScalarProduct3(u,u)));
 * REAL ScalarProduct3(a,b)
 *     Returns vector scalar product (a . b)
 * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL ScalarProduct3(a,b)
- REAL *a,*b;
+REAL ScalarProduct3(REAL *a, REAL *b)
  {
     return(*a* *b + *(a+1)* *(b+1) + *(a+2)* *(b+2));
  }
@@ -163,8 +159,7 @@ REAL ScalarProduct3(a,b)
  *  CrossProduct(a,b,v)
  *     Vector cross product (v = a x b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void CrossProduct(a,b,v)
- REAL *a,*b,*v;
+void CrossProduct(REAL *a, REAL *b, REAL *v)
  {
      int i,j,k;
      for (i=0;i<3;i++) {
@@ -179,8 +174,7 @@ void CrossProduct(a,b,v)
  * * * * * * * * * * * * * * * * * * * * * * * * */
 #define TOL 1.e-8
 
-int VectorNormalize3(a)
- REAL *a;
+int VectorNormalize3(REAL *a)
 {
  REAL b;
  b=sqrt(*a* *a+ *(a+1)* *(a+1)+ *(a+2)* *(a+2));
@@ -197,9 +191,7 @@ int VectorNormalize3(a)
 * * * * * * * * * * * * * * * * * * * * * * * * * */
 #undef SQUARE
 #define SQUARE(x) (x)*(x)
-REAL DistSq(a,b)
- REAL *a,*b;     /* 3-vectors */
-
+REAL DistSq(REAL *a, REAL *b)     /* 3-vectors */
  {
  REAL r2;
  int k;
@@ -208,4 +200,3 @@ REAL DistSq(a,b)
      for (k=0;k<3;k++) r2+=SQUARE(*(a+k)-*(b+k));
      return(r2);
 }
-
