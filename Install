@@ -12,7 +12,7 @@ echo " "
 
 echo -n "* -->"
 
-set MACHINE = $<
+set MACHINE = $1
 
 /bin/rm -f dowserinit
 echo "setenv DOWSER `pwd`" > dowserinit

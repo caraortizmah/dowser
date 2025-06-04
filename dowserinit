@@ -1,0 +1,3 @@
+setenv DOWSER /app
+setenv DOW_MACH linux
+set path = ( $path $DOWSER/bin $DOWSER/bin/$DOW_MACH )
