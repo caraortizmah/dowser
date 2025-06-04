@@ -16,10 +16,10 @@
 
 #define CALL (void)
 
-extern REAL ScalarProduct3();
-extern void CrossProduct();
-extern void VectorNormalize3();
-void TurnMol();
+extern REAL ScalarProduct3(REAL *a, REAL *b);
+extern void CrossProduct(REAL *a, REAL *b, REAL *v);
+extern void VectorNormalize3(REAL *a);
+void TurnMol(REAL angle, REAL *spindle, REAL *Xyz, int pivot, int Num_atoms);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *     Align (Num_atoms,Xyz,pivot,vector_x,vector)
@@ -28,10 +28,7 @@ void TurnMol();
  *        parallel with vector[]
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void Align (Num_atoms,Xyz,pivot,vector_x,vector)
-int Num_atoms,pivot;
-REAL *Xyz,*vector_x,*vector;
-
+void Align (int Num_atoms, int pivot, REAL *Xyz, REAL *vector_x, REAL *vector)
 {
 int i;
 REAL u[3],v[3],w[3];
@@ -56,12 +53,7 @@ REAL angle;
  *       rotate a molecule about a spindle (on atom=pivot, || spindle) by angle
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void TurnMol (angle, spindle, Xyz, pivot, Num_atoms)
-REAL angle;         /* by how much */
-REAL *spindle;
-REAL *Xyz;          /* coordinate set */
-int pivot, Num_atoms;
-
+void TurnMol (REAL angle, REAL *spindle, REAL *Xyz, int pivot, int Num_atoms)
 {
     REAL u[3], v[3], w[3], s[3];
     REAL cosa1, sina, Pair ();
@@ -91,8 +83,7 @@ int pivot, Num_atoms;
  *  CrossProduct(a,b,v)
  *     Vector cross product (v = a x b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void CrossProduct(a,b,v)
- REAL *a,*b,*v;
+void CrossProduct(REAL *a, REAL *b, REAL *v)
  {
      int i,j,k;
      for (i=0;i<3;i++) {
@@ -106,8 +97,7 @@ void CrossProduct(a,b,v)
  * REAL ScalarProduct3(a,b)
  *     Returns vector scalar product (a . b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
- REAL ScalarProduct3(a,b)
- REAL *a,*b;
+ REAL ScalarProduct3(REAL *a, REAL *b)
  {
      return(*a* *b + *(a+1)* *(b+1) + *(a+2)* *(b+2));
  }
@@ -116,8 +106,7 @@ void CrossProduct(a,b,v)
  * VectorNormalize3(a)
  *     vector a is replaced by a/|a|
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void VectorNormalize3(a)
- REAL *a;
+void VectorNormalize3(REAL *a)
 {
  REAL b;
  b=1./sqrt(*a* *a+ *(a+1)* *(a+1)+ *(a+2)* *(a+2));
