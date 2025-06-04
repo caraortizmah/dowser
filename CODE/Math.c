@@ -36,8 +36,7 @@ int Random_seed; /* external variable */
  *  CrossProduct(a,b,v)
  *     Vector cross product (v = a x b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void CrossProduct(a,b,v)
- REAL *a,*b,*v;
+void CrossProduct(REAL *a, REAL *b, REAL *v)
  {
      int i,j,k;
      for (i=0;i<3;i++) {
@@ -51,8 +50,7 @@ void CrossProduct(a,b,v)
  * REAL ScalarProduct3(a,b)
  *     Returns vector scalar product (a . b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
- REAL ScalarProduct3(a,b)
- REAL *a,*b;
+ REAL ScalarProduct3(REAL *a, REAL *b)
  {
      return(*a* *b + *(a+1)* *(b+1) + *(a+2)* *(b+2));
  }
@@ -61,8 +59,7 @@ void CrossProduct(a,b,v)
  * VectorNormalize3(a)
  *     vector a is replaced by a/|a|
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void VectorNormalize3(a)
- REAL *a;
+void VectorNormalize3(REAL *a)
 {
  REAL b;
  b=1./sqrt(*a* *a+ *(a+1)* *(a+1)+ *(a+2)* *(a+2));
@@ -77,9 +74,7 @@ void VectorNormalize3(a)
  *    r is the 3 x 3 matrix that is replaced by its inverse
  *    the function returns FALSE if OK, TRUE if singular matrix
  * * * * * * * * * * * * * * * * * * * * * * * * */
-int MatrixInv3(r,N,deter)
-REAL *r,*deter; int N;
-
+int MatrixInv3(REAL *r, int N, REAL *deter)
 {
  REAL cofa1,cofa2,cofa3,cofa4,cofa5,cofa6,cofa7,cofa8,cofa9;
  REAL rdet; /* reciprocal of determinant */
@@ -115,9 +110,7 @@ REAL *r,*deter; int N;
  *    a x b => c 
  * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void MatrixXVector3(a,b,c)
-REAL *a,*b,*c;
-
+void MatrixXVector3(REAL *a, REAL *b, REAL *c)
 {
  int i,j;
  for (i=0;i<3;i++) {
@@ -129,9 +122,7 @@ REAL *a,*b,*c;
 /* * * * * * * * * * * * * * * * * * * * * * * * * *
  *   dist_sq: returns distance between 2 points
  * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL DistSq(a,b)
-REAL *a,*b;	/* 3-vectors */
-
+REAL DistSq(REAL *a, REAL *b)	/* 3-vectors */
 {
     REAL r2;
     int k;
@@ -152,9 +143,7 @@ REAL *a,*b;	/* 3-vectors */
  *	u=vector b-a
  *	function returns the distance between a and b
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL Pair(a,b,u)
-REAL *a,*b,*u;
-
+REAL Pair(REAL *a, REAL *b, REAL *u)
 {
 int i;
 /*
@@ -178,10 +167,7 @@ return (sqrt(ScalarProduct3(u,u)));
 
 #define TRUE 1
 #define FLOAT double
-int MatrixInv (A,N,determinant)
-
-REAL *A,*determinant; int N;
-
+int MatrixInv(REAL *A, int N, REAL *determinant)
 { 
     static int old_N=0;
     static FLOAT *coef,*consta;
@@ -318,8 +304,7 @@ REAL *A,*determinant; int N;
  *    if one of the args is zero, then also return 0.
  *    if an arg is negative, get positive answer.
  * * * * * * * * * * * * * * * * * * * */
-int LeastCommonMultiple(j,k)
-int j,k;
+int LeastCommonMultiple(int j, int k)
 {
 #define NUM_PRIMES 10
     static int primes[NUM_PRIMES]={2,3,5,7,11,13,17,19,25,29};
@@ -393,8 +378,7 @@ static long int masker=2147483647;
  * low) should be called (once) before the first time this function is
  * called.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL RandU ()
-
+REAL RandU (void)
 {
     static REAL minv = ((REAL) 1) / m;
 
@@ -411,9 +395,7 @@ REAL RandU ()
  * this subroutine is called.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void RandU_vec (n, vec)
-int n; REAL *vec; 
-
+void RandU_vec (int n, REAL *vec) 
 {
     static REAL minv = ((REAL) 1) / m;
     REAL *avec;
@@ -435,8 +417,7 @@ int n; REAL *vec;
  * to generate random numbers.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int GetRandomSeed ()
-
+int GetRandomSeed (void)
 {
     return Random_seed;
 }
@@ -449,9 +430,7 @@ int GetRandomSeed ()
  * is called.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void PutRandomSeed (iseed)
-int iseed;
-
+void PutRandomSeed (int iseed)
 {
       if (iseed < 0 && iseed < m) Random_seed = iseed;
       else Random_seed = 1;
@@ -469,9 +448,7 @@ int iseed;
  * should be called once before the first time this subroutine is called.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void RandN_vec1 (n, vec)
-int n; REAL *vec;
-
+void RandN_vec1 (int n, REAL *vec)
 #define p0 (REAL) -.322232431088e0
 #define p1 (REAL) -1e0
 #define p2 (REAL) -.342242088547e0
@@ -512,9 +489,7 @@ int n; REAL *vec;
  * tine offers an alternative to RandN_vec1 above.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void RandN_vec2 (n, vec, mean, var)
-int n; REAL *vec, mean, *var;
-
+void RandN_vec2 (int n, REAL *vec, REAL mean, REAL *var)
 {
       int i;
       REAL *avec, *avar;
@@ -544,9 +519,7 @@ int n; REAL *vec, mean, *var;
  *  < sum {vec[i]**2} >  = sum {var[i]}.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void RandN_vec3 (n, vec, mean, var)
-int n; REAL mean,*vec,*var;
-
+void RandN_vec3 (int n, REAL mean, REAL *vec, REAL *var)
 #define zero (REAL) 0.0
 #define one (REAL) 1.0
 #define two (REAL) 2.0
@@ -602,6 +575,4 @@ static int flipflop = 0;
 	ran_force[1] = a * cos(b);
 	ran_force[2] = a * sin(b);
     }
-}         
-
-
+}
