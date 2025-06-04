@@ -25,17 +25,12 @@
 #define CALL (void) 
 #define SQRT sqrt
 
-REAL ScalarProduct3(REAL *a, REAL *b);
+int Add1Atom (PDB *atoms, int backback, int backat, int refatom, int atomx, REAL bondlength, REAL bondangle, REAL dihedral);
+REAL ScalarProduct3 (REAL *a, REAL *b);
 void CrossProduct(REAL *a, REAL *b, REAL *v);
 void VectorNormalize3(REAL *a);
 
-int 
-    Add1Atom (atoms,backback, backat, refatom, atomx, bondlength, bondangle, dihedral)
-
-int backback, backat, refatom, atomx;
-REAL bondlength, bondangle, dihedral;
-PDB *atoms;
-
+int Add1Atom (PDB *atoms, int backback, int backat, int refatom, int atomx, REAL bondlength, REAL bondangle, REAL dihedral)
 {
     int i, j, kd, kd1;
     REAL aa, tem, eel;
@@ -127,8 +122,7 @@ PDB *atoms;
  *  CrossProduct(a,b,v)
  *     Vector cross product (v = a x b)
  * * * * * * * * * * * * * * * * * * * * * * * * */
-void CrossProduct(a,b,v)
-REAL *a,*b,*v;
+void CrossProduct(REAL *a, REAL *b, REAL *v)
 {
 	int i,j,k;
 	for (i=0;i<3;i++) {
@@ -140,8 +134,7 @@ REAL *a,*b,*v;
 * REAL ScalarProduct3(a,b)
 *     Returns vector scalar product (a . b)
 * * * * * * * * * * * * * * * * * * * * * * * * */
-REAL ScalarProduct3(a,b)
-REAL *a,*b;
+REAL ScalarProduct3(REAL *a, REAL *b)
 {
 	return(*a* *b + *(a+1)* *(b+1) + *(a+2)* *(b+2));
 }
@@ -149,8 +142,7 @@ REAL *a,*b;
 * VectorNormalize3(a)
 *     vector a is replaced by a/|a|
 * * * * * * * * * * * * * * * * * * * * * * * * */
-void VectorNormalize3(a)
-REAL *a;
+void VectorNormalize3(REAL *a)
 {
 	REAL b;
 	b=1./SQRT(*a* *a+ *(a+1)* *(a+1)+ *(a+2)* *(a+2));
@@ -158,4 +150,3 @@ REAL *a;
 	*(a+1) *= b;
 	*(a+2) *= b;
 }
-
