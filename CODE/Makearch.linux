@@ -20,7 +20,7 @@ MAKE            = make
 #####
 # extra compiler and linker options
 #####
-ARCH_COPTS	= -DLinux
+ARCH_COPTS	= -DLinux -Wno-old-style-definition -std=gnu89
 ARCH_FOPTS	=
 ARCH_LOPTS      = -lm
 ARCH_FLOPTS     =
